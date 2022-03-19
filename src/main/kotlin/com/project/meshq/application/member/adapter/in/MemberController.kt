@@ -1,4 +1,4 @@
-package com.project.meshq.member.adapter
+package com.project.meshq.application.member.adapter.`in`
 
 import org.springframework.web.bind.annotation.RestController
 
