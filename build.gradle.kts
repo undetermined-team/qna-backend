@@ -28,6 +28,9 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
+    //swagger
+    implementation("io.springfox:springfox-boot-starter:3.0.0")
+
     //querydsl
     implementation("com.querydsl:querydsl-jpa:4.2.1")
     implementation("org.mariadb.jdbc:mariadb-java-client:2.7.0")
@@ -36,8 +39,9 @@ dependencies {
     annotationProcessor(group = "com.querydsl", name = "querydsl-apt", classifier = "jpa")
 }
 
+
 //querydsl
-sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class){
+sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
     kotlin.srcDir("$buildDir/generated/source/kapt/main")
 }
 
