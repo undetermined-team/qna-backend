@@ -1,12 +1,13 @@
 package com.project.meshq.application.member.domain
 
-import com.project.meshq.core.jpa.BaseEntityModel
+import com.project.meshq.core.jpa.BaseEntity
 import javax.persistence.Entity
-import javax.persistence.Table
 
 @Entity
 class Member(
     val email: String,
+    val name: String,
     val pwd: String,
-): BaseEntityModel() {
+): BaseEntity() {
+
 }

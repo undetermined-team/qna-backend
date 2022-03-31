@@ -2,24 +2,49 @@ package com.project.meshq.application.member.domain
 
 import com.project.meshq.application.member.adapter.out.MemberRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
+import org.springframework.test.annotation.Rollback
+import org.springframework.transaction.annotation.Transactional
+import javax.persistence.EntityManager
 
-@DataJpaTest
+@Transactional
+@SpringBootTest
 internal class MemberTest @Autowired constructor(
-    val memberRepository: MemberRepository
+    val memberRepository: MemberRepository,
+    val entityManager: EntityManager
 ) {
 
     @Test
-    fun `mappedSuperclass 테스트`() {
+    fun `audit 테스트`() {
         //given
-        val member = Member(email = "test@test.com", pwd = "123456789")
+        val member = Member(email = "test@test.com", pwd = "123456789", name = "test_name")
         //when
-        memberRepository.save(member)
+        val memberEntity = memberRepository.save(member)
+        entityManager.flush()
+        entityManager.clear()
         //then
-        assertThat(member.email).isEqualTo("test@test.com")
-        assertThat(member.pwd).isEqualTo("123456789")
+        assertThat(memberEntity.email).isEqualTo("test@test.com")
+        assertThat(memberEntity.pwd).isEqualTo("123456789")
+//        assertThat(memberEntity.createdAt).isNotNull
+//        assertThat(memberEntity.updatedAt).isNotNull
+        assertThat(memberEntity.id).isNotNull
+    }
 
+    @Test
+    fun `equal 테스트`() {
+        //given
+        val member = Member(email = "test@test.com", pwd = "123456789", name = "test_name")
+        //when
+        val memberEntity1 = memberRepository.save(member)
+        entityManager.flush()
+        entityManager.clear()
+        //then
+        val memberEntity2 = memberRepository.findById(memberEntity1.id!!).get()
+        assertThat(memberEntity1).isEqualTo(memberEntity2)
     }
 }

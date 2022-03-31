@@ -11,11 +11,7 @@ import javax.persistence.MappedSuperclass
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseEntityModel {
-    @Id
-    @GeneratedValue
-    val id: Long = 0
-
+abstract class BaseEntity: CommonIdEntity() {
     @CreatedDate
     var createdAt: LocalDateTime? = null
 
