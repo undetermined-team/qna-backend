@@ -22,23 +22,20 @@ internal class MemberTest @Autowired constructor(
     @Test
     fun `audit 테스트`() {
         //given
-        val member = Member(email = "test@test.com", pwd = "123456789", name = "test_name")
+        val member = Member(email = "test@test.com", pwd = "123456789", name = "test_name", role = Role.USER)
         //when
         val memberEntity = memberRepository.save(member)
         entityManager.flush()
         entityManager.clear()
         //then
-        assertThat(memberEntity.email).isEqualTo("test@test.com")
-        assertThat(memberEntity.pwd).isEqualTo("123456789")
-//        assertThat(memberEntity.createdAt).isNotNull
-//        assertThat(memberEntity.updatedAt).isNotNull
-        assertThat(memberEntity.id).isNotNull
+        assertThat(memberEntity.createdAt).isNotNull
+        assertThat(memberEntity.updatedAt).isNotNull
     }
 
     @Test
     fun `equal 테스트`() {
         //given
-        val member = Member(email = "test@test.com", pwd = "123456789", name = "test_name")
+        val member = Member(email = "test@test.com", pwd = "123456789", name = "test_name", role = Role.USER)
         //when
         val memberEntity1 = memberRepository.save(member)
         entityManager.flush()
