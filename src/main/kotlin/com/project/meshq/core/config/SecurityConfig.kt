@@ -1,5 +1,9 @@
 package com.project.meshq.core.config
 
+import CustomOAuth2UserService
+import OAuth2SuccessHandler
+import com.daou.hc.common.exception.CustomAccessDeniedHandler
+import com.daou.hc.common.exception.CustomAuthenticationEntryPoint
 import com.project.meshq.application.member.domain.Role
 import com.project.meshq.core.jwt.JwtAuthenticationFilter
 import com.project.meshq.core.jwt.JwtTokenProvider
@@ -18,15 +22,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
-    private val jwtTokenProvider: JwtTokenProvider
+    private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint,
+    private val customAccessDeniedHandler: CustomAccessDeniedHandler,
+    private val customOAuth2UserService: CustomOAuth2UserService,
+    private val oAuth2SuccessHandler: OAuth2SuccessHandler
 ): WebSecurityConfigurerAdapter() {
 
-    @Bean
-    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
-
     override fun configure(http: HttpSecurity) {
-        http.csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) //session stop
+        http
+            .cors()
+            .and()
+            .csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeRequests()
             .antMatchers("/admin/**").hasRole("ADMIN")
@@ -35,9 +42,24 @@ class SecurityConfig(
                 "/swagger-ui/**", "/swagger-resources/**", "/swagger/**", "/webjars/**", "/swagger-ui.html",
                 "/v2/api-docs", "/v3/api-docs", "/h2-console/**", "/").permitAll()
             .anyRequest().authenticated()
+        .and()
+            .formLogin().disable()
+            .httpBasic().disable()
+            .exceptionHandling()
+            .authenticationEntryPoint(customAuthenticationEntryPoint)
+            .accessDeniedHandler(customAccessDeniedHandler)
+        .and()
+            .addFilterBefore(
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter::class.java)
 
-        //UsernamePassword Filter 이전 JwtCustomFilter 를 등록하는 과정
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+
+        http
+            .oauth2Login()
+            .userInfoEndpoint()
+            .userService(customOAuth2UserService)
+        .and()
+            .successHandler(oAuth2SuccessHandler)
     }
 
 }

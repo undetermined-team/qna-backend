@@ -1,6 +1,5 @@
 package com.project.meshq.core.jwt
 
-import com.project.meshq.application.member.application.service.CustomUserDetailService
 import org.springframework.stereotype.Component
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
