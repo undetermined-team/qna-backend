@@ -1,77 +1,69 @@
 package com.project.meshq.application.member.adapter.`in`
 
-import com.daou.hc.common.util.*
-import com.daou.hc.member.service.MemberService
-import com.daou.hc.core.controller.ApiController
-import com.daou.hc.core.jwt.JwtTokenProvider
+import com.project.meshq.application.member.application.port.`in`.CrudMemberUseCase
+import com.project.meshq.application.member.domain.Member
+import com.project.meshq.application.member.domain.Role
+import com.project.meshq.application.util.ACCESS_TOKEN_VALID_TIME
+import com.project.meshq.core.jwt.JwtTokenProvider
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import javax.validation.Valid
+import org.springframework.web.bind.annotation.*
+import java.security.Principal
 
-
+@Api(tags = ["회원관련 API"], description = "회원 CRUD")
 @RestController
-class AuthController(
-    private val memberService: MemberService,
-    private val jwtTokenProvider: JwtTokenProvider
-) : ApiController() {
+class AuthMemberController(
+    val crudMemberUseCase: CrudMemberUseCase,
+    val jwtTokenProvider: JwtTokenProvider
+) {
 
-    @GetMapping("/member/sign-in")
-    fun signIn(signInModel: SignInModel, response: HttpServletResponse): ResponseEntity<Void> {
-        val tokenDataModel = memberService.checkPassword(
-            signInModel.email,
-            signInModel.password
-        )
+    @ApiOperation("회원가입")
+    @PostMapping("/signup")
+    fun signUp(@RequestBody memberSignUp: MemberSignUp): ResponseEntity<Long> {
+        val id = crudMemberUseCase.signUp(memberSignUp)
 
-        val accessToken = jwtTokenProvider.createToken(tokenDataModel, ACCESS_TOKEN_VALID_TIME)
-        response.addCookie(
-            cookieGenerator(
-                ACCESS_TOKEN,
-                accessToken
-            )
-        )
-
-        val refreshToken = jwtTokenProvider.createToken(tokenDataModel, REFRESH_TOKEN_VALID_TIME)
-        response.addCookie(
-            cookieGenerator(
-                REFRESH_TOKEN,
-                refreshToken
-            )
-        )
-
-        memberService.updateRefreshToken(tokenDataModel.id, refreshToken)
-        return ResponseEntity.noContent().build()
+        return ResponseEntity.ok().body(id)
     }
 
-    @PostMapping("/member/sign-up")
-    fun signUp(@RequestBody @Valid signUpModel: SignUpModel): ResponseEntity<Long> {
-        val memberId = memberService.createMember(signUpModel)
+    @ApiOperation("로그인")
+    @PostMapping("/login")
+    fun signUp(@RequestBody memberLogin: MemberLogin): ResponseEntity<String> {
+        val responseMember = crudMemberUseCase.login(memberLogin)
 
-        return ResponseEntity.ok(memberId)
+        return ResponseEntity.ok().body(
+            jwtTokenProvider.createToken(responseMember, ACCESS_TOKEN_VALID_TIME))
     }
 
-    @GetMapping("/refresh/access-token")
-    fun refreshAccessToken(request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<Void> {
-        val refreshToken = jwtTokenProvider.resolve(request)
-        val tokenDataModel: TokenDataModel = memberService.compareRefreshToken(memberId(), refreshToken)
-
-        val accessToken = jwtTokenProvider.createToken(tokenDataModel, ACCESS_TOKEN_VALID_TIME)
-        response.addCookie(cookieGenerator(ACCESS_TOKEN, accessToken))
-
-        return ResponseEntity.noContent().build()
+    @ApiOperation("토큰 테스트")
+    @GetMapping("/member/testA")
+    fun testA(principal: Principal): ResponseEntity<String> {
+        println(principal.name)
+        return ResponseEntity.ok().body("token test")
     }
-
-    @GetMapping("/member/test")
-    fun tokenTest(): String {
-        println(memberId())
-        println(memberRole())
-        return "token test"
-    }
-
 }
 
+data class MemberSignUp(
+    val email: String,
+    val name: String,
+    val pwd: String
+) {
+    fun toDomain(): Member {
+        return Member(email, name, pwd)
+    }
+}
 
+data class MemberLogin(
+    val email: String,
+    val pwd: String
+) {
+    fun toDomain(): Member {
+        return Member(email = email, pwd = pwd)
+    }
+}
+
+data class ResponseMember(
+    val email: String,
+    val role: Role,
+    val snsId: String?
+)

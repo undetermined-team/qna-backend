@@ -1,4 +1,4 @@
-
+package com.project.meshq.core.oauth
 
 class OAuth2Attribute(
     private val id: String,
@@ -17,7 +17,7 @@ class OAuth2Attribute(
             return when (provider) {
                 "naver" -> naver(attributes)
                 "kakao" -> kakao(attributes)
-                else -> throw WebException(ExceptionCode.PROVIDER_NOT_FOUND)
+                else -> throw RuntimeException()
             }
         }
 

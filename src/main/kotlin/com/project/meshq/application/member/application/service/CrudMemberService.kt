@@ -5,11 +5,9 @@ import com.project.meshq.application.member.adapter.`in`.MemberSignUp
 import com.project.meshq.application.member.adapter.`in`.ResponseMember
 import com.project.meshq.application.member.adapter.out.MemberRepository
 import com.project.meshq.application.member.application.port.`in`.CrudMemberUseCase
-import com.project.meshq.application.member.domain.Member
 import com.project.meshq.application.member.domain.Role
 import com.project.meshq.application.util.ExceptionType
 import com.project.meshq.application.util.throwCheck
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -37,6 +35,8 @@ class CrudMemberService(
         if(!passwordEncoder.matches(memberLogin.pwd, member.pwd))
             throw RuntimeException("TEST")
 
-        return ResponseMember(member.email, member.role)
+        return ResponseMember(member.email, member.role, member.snsId)
     }
+
+
 }

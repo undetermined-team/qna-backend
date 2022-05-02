@@ -1,4 +1,4 @@
-package com.daou.hc.common.exception
+package com.project.meshq.core.exception
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.HttpStatus
@@ -19,11 +19,7 @@ class CustomAccessDeniedHandler: AccessDeniedHandler {
         response.status = HttpServletResponse.SC_FORBIDDEN;
         ObjectMapper().writeValue(
             response.outputStream,
-            FilterExceptionCode(
-                HttpStatus.FORBIDDEN,
-                "403",
-                "접근 권한이 없습니다"
-            )
+            RuntimeException()
         )
     }
 }

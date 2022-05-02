@@ -1,12 +1,12 @@
 package com.project.meshq.core.config
 
-import CustomOAuth2UserService
-import OAuth2SuccessHandler
-import com.daou.hc.common.exception.CustomAccessDeniedHandler
-import com.daou.hc.common.exception.CustomAuthenticationEntryPoint
 import com.project.meshq.application.member.domain.Role
+import com.project.meshq.core.exception.CustomAccessDeniedHandler
+import com.project.meshq.core.exception.CustomAuthenticationEntryPoint
 import com.project.meshq.core.jwt.JwtAuthenticationFilter
 import com.project.meshq.core.jwt.JwtTokenProvider
+import com.project.meshq.core.oauth.CustomOAuth2UserService
+import com.project.meshq.core.oauth.OAuth2SuccessHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity

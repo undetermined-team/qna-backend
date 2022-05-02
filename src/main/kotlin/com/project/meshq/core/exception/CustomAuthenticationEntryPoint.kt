@@ -1,4 +1,4 @@
-package com.daou.hc.common.exception
+package com.project.meshq.core.exception
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
+import java.lang.RuntimeException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -20,23 +21,18 @@ class CustomAuthenticationEntryPoint : AuthenticationEntryPoint {
     ) {
         val exception: Any? = request.getAttribute("exception")
 
-        outputStream(response, (exception ?: ExceptionCode.AUTHENTICATION_FAIL) as ExceptionCode)
+        outputStream(response)
     }
 
     private fun outputStream(
         response: HttpServletResponse,
-        exception: ExceptionCode
     ) {
         response.contentType = "application/json";
         response.status = HttpServletResponse.SC_UNAUTHORIZED;
 
         ObjectMapper().writeValue(
             response.outputStream,
-            FilterExceptionCode(
-                exception.httpStatus,
-                exception.code,
-                exception.message
-            )
+            RuntimeException()
         )
     }
 }

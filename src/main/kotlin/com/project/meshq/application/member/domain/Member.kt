@@ -10,6 +10,7 @@ class Member(
     val email: String,
     val name: String = "",
     var pwd: String,
+    val snsId: String? = null,
     var role: Role = Role.UNKNOWN
 ): BaseEntity() {
 
